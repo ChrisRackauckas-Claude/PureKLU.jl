@@ -281,10 +281,10 @@ function strict_match_all(A::SparseMatrixCSC)
     @test K_ref.p == K_pj.p
     @test K_ref.q == K_pj.q
     @test K_ref.R == K_pj.R
-    @test K_ref.Rs == K_pj.Rs
-    @test K_ref.L == K_pj.L
-    @test K_ref.U == K_pj.U
-    return @test K_ref.F == K_pj.F
+    @test strict_eq(K_ref.Rs, K_pj.Rs)
+    @test strict_eq(K_ref.L, K_pj.L)
+    @test strict_eq(K_ref.U, K_pj.U)
+    return @test strict_eq(K_ref.F, K_pj.F)
 end
 
 # ---------- sparse matrix zoo: structure variety ---------------------------
@@ -436,16 +436,16 @@ end
         B = sparse(I_idx, J_idx, V2, n, n)
         K_ref = KLU.klu(A); KLU.klu!(K_ref, B)
         K_pj = PureKLU.klu(A; use_fma = USE_FMA, detect_banded = false); PureKLU.klu!(K_pj, B)
-        @test K_ref.L == K_pj.L
-        @test K_ref.U == K_pj.U
-        @test K_ref.F == K_pj.F
-        @test K_ref.Rs == K_pj.Rs
+        @test strict_eq(K_ref.L, K_pj.L)
+        @test strict_eq(K_ref.U, K_pj.U)
+        @test strict_eq(K_ref.F, K_pj.F)
+        @test strict_eq(K_ref.Rs, K_pj.Rs)
         # refactor with just nzval
         K_ref2 = KLU.klu(A); KLU.klu!(K_ref2, B.nzval)
         K_pj2 = PureKLU.klu(A; use_fma = USE_FMA, detect_banded = false); PureKLU.klu!(K_pj2, B.nzval)
-        @test K_ref2.L == K_pj2.L
-        @test K_ref2.U == K_pj2.U
-        @test K_ref2.F == K_pj2.F
+        @test strict_eq(K_ref2.L, K_pj2.L)
+        @test strict_eq(K_ref2.U, K_pj2.U)
+        @test strict_eq(K_ref2.F, K_pj2.F)
     end
 end
 
@@ -464,8 +464,8 @@ end
         PureKLU.klu_factor!(K_pj)
         @test K_ref.p == K_pj.p
         @test K_ref.q == K_pj.q
-        @test K_ref.L == K_pj.L
-        @test K_ref.U == K_pj.U
+        @test strict_eq(K_ref.L, K_pj.L)
+        @test strict_eq(K_ref.U, K_pj.U)
         b = randn(n)
         @test K_ref \ b ≈ K_pj \ b
     end
