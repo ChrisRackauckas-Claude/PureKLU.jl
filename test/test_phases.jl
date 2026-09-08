@@ -205,9 +205,9 @@ end
         K_pj.common.scale = Int32(0)
         KLU.klu_factor!(K_ref)
         PureKLU.klu_factor!(K_pj)
-        @test K_ref.L == K_pj.L
-        @test K_ref.U == K_pj.U
-        @test K_ref.F == K_pj.F
+        @test strict_eq(K_ref.L, K_pj.L)
+        @test strict_eq(K_ref.U, K_pj.U)
+        @test strict_eq(K_ref.F, K_pj.F)
         b = randn(n)
         @test K_ref \ b ≈ K_pj \ b
         # Refactor with new values on the same pattern; status must still be OK.
@@ -215,9 +215,9 @@ end
         Anew = SparseMatrixCSC(n, n, copy(A.colptr), copy(A.rowval), Vnew)
         KLU.klu!(K_ref, Anew)
         PureKLU.klu!(K_pj, Anew)
-        @test K_ref.L == K_pj.L
-        @test K_ref.U == K_pj.U
-        @test K_ref.F == K_pj.F
+        @test strict_eq(K_ref.L, K_pj.L)
+        @test strict_eq(K_ref.U, K_pj.U)
+        @test strict_eq(K_ref.F, K_pj.F)
         @test Int(K_pj.common.status) == 0
         # Refactor on .nzval-only path. Warm once, then assert 0 allocs.
         nz = Anew.nzval
