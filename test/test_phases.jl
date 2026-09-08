@@ -622,8 +622,8 @@ end
     Random.seed!(91)
     n = 12
     A = sprand(n, n, 0.3) + n * I
-    P_user = Vector{Int64}(0:(n - 1))     # 0-based identity
-    Q_user = Vector{Int64}(0:(n - 1))
+    P_user = Vector{Int}(0:(n - 1))     # 0-based identity; native Int = Ti on this arch
+    Q_user = Vector{Int}(0:(n - 1))
     K_ref = KLU.KLUFactorization(A)
     KLU.klu_analyze!(K_ref, copy(P_user), copy(Q_user))
     K_pj = PureKLU.KLUFactorization(A)
