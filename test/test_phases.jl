@@ -576,7 +576,7 @@ end
         @test strict_eq(K_ref.F, K_pj.F)
         @test strict_eq(K_ref.Rs, K_pj.Rs)
         b = randn(n)
-        @test K_ref \ b == K_pj \ b
+        @test strict_eq(K_ref \ b, K_pj \ b)
     end
 end
 
@@ -647,7 +647,7 @@ end
     @test K_ref.p == K_pj.p
     @test K_ref.q == K_pj.q
     @test strict_eq(K_ref.U, K_pj.U)
-    @test K_ref \ [6.0] == K_pj \ [6.0]
+    @test strict_eq(K_ref \ [6.0], K_pj \ [6.0])
 
     # 2x2 various
     for M in (
