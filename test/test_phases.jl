@@ -571,10 +571,10 @@ end
         B = sparse(I_idx, J_idx, V, n, n)
         KLU.klu!(K_ref, B)
         PureKLU.klu!(K_pj, B)
-        @test K_ref.L == K_pj.L
-        @test K_ref.U == K_pj.U
-        @test K_ref.F == K_pj.F
-        @test K_ref.Rs == K_pj.Rs
+        @test strict_eq(K_ref.L, K_pj.L)
+        @test strict_eq(K_ref.U, K_pj.U)
+        @test strict_eq(K_ref.F, K_pj.F)
+        @test strict_eq(K_ref.Rs, K_pj.Rs)
         b = randn(n)
         @test K_ref \ b == K_pj \ b
     end
@@ -634,8 +634,8 @@ end
     KLU.klu_factor!(K_ref); PureKLU.klu_factor!(K_pj)
     @test K_ref.p == K_pj.p
     @test K_ref.q == K_pj.q
-    @test K_ref.L == K_pj.L
-    @test K_ref.U == K_pj.U
+    @test strict_eq(K_ref.L, K_pj.L)
+    @test strict_eq(K_ref.U, K_pj.U)
 end
 
 # ---------- 1×1 / 2×2 degenerate matrices ----------------------------------
@@ -646,7 +646,7 @@ end
     K_ref = KLU.klu(A1); K_pj = PureKLU.klu(A1; use_fma = USE_FMA, detect_banded = false)
     @test K_ref.p == K_pj.p
     @test K_ref.q == K_pj.q
-    @test K_ref.U == K_pj.U
+    @test strict_eq(K_ref.U, K_pj.U)
     @test K_ref \ [6.0] == K_pj \ [6.0]
 
     # 2x2 various
@@ -660,8 +660,8 @@ end
         K_ref = KLU.klu(A); K_pj = PureKLU.klu(A; use_fma = USE_FMA, detect_banded = false)
         @test K_ref.p == K_pj.p
         @test K_ref.q == K_pj.q
-        @test K_ref.L == K_pj.L
-        @test K_ref.U == K_pj.U
+        @test strict_eq(K_ref.L, K_pj.L)
+        @test strict_eq(K_ref.U, K_pj.U)
     end
 end
 
