@@ -267,7 +267,8 @@ end
         @test K_ref.p == K_pj.p
         @test K_ref.q == K_pj.q
         @test K_ref.R == K_pj.R
-        @test K_ref.Rs == K_pj.Rs
+        # Rs can differ by 1 ulp on i686 vs SuiteSparse; use STRICT_FP gate
+        @test strict_eq(K_ref.Rs, K_pj.Rs)
         @test strict_eq(K_ref.L, K_pj.L)
         @test strict_eq(K_ref.U, K_pj.U)
         @test strict_eq(K_ref.F, K_pj.F)
