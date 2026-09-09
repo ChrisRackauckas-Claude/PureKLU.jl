@@ -97,7 +97,7 @@ function amd_aat!(
     return nzaat
 end
 
-@inline function _clear_flag(wflg::Int, wbig::Int, W::AbstractVector{Ti}, n::Int) where {Ti}
+@inline function _clear_flag(wflg::Integer, wbig::Integer, W::AbstractVector{Ti}, n::Integer) where {Ti}
     if wflg < 2 || wflg >= wbig
         @inbounds for x in 1:n
             if W[x] != 0
@@ -210,7 +210,7 @@ function amd_2!(
     end
 
     wbig = typemax(Ti) - Ti(n)
-    wflg = _clear_flag(0, Int(wbig), W, n)
+    wflg = _clear_flag(0, wbig, W, n)
 
     ndense = 0
     @inbounds for i in 0:(n - 1)
@@ -347,7 +347,7 @@ function amd_2!(
         Len[me + 1] = Ti(pme2 - pme1 + 1)
         Elen[me + 1] = Ti(_flip(nvpiv + degme))
 
-        wflg = _clear_flag(wflg, Int(wbig), W, n)
+        wflg = _clear_flag(wflg, wbig, W, n)
 
         # --- Scan 1 ---
         for pme in pme1:pme2
@@ -459,7 +459,7 @@ function amd_2!(
             lemax = degme
         end
         wflg += lemax
-        wflg = _clear_flag(wflg, Int(wbig), W, n)
+        wflg = _clear_flag(wflg, wbig, W, n)
 
         # --- Supervariable detection ---
         for pme in pme1:pme2

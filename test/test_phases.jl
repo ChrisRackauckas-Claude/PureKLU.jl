@@ -205,9 +205,9 @@ end
         K_pj.common.scale = Int32(0)
         KLU.klu_factor!(K_ref)
         PureKLU.klu_factor!(K_pj)
-        @test K_ref.L == K_pj.L
-        @test K_ref.U == K_pj.U
-        @test K_ref.F == K_pj.F
+        @test strict_eq(K_ref.L, K_pj.L)
+        @test strict_eq(K_ref.U, K_pj.U)
+        @test strict_eq(K_ref.F, K_pj.F)
         b = randn(n)
         @test K_ref \ b ≈ K_pj \ b
         # Refactor with new values on the same pattern; status must still be OK.
@@ -215,9 +215,9 @@ end
         Anew = SparseMatrixCSC(n, n, copy(A.colptr), copy(A.rowval), Vnew)
         KLU.klu!(K_ref, Anew)
         PureKLU.klu!(K_pj, Anew)
-        @test K_ref.L == K_pj.L
-        @test K_ref.U == K_pj.U
-        @test K_ref.F == K_pj.F
+        @test strict_eq(K_ref.L, K_pj.L)
+        @test strict_eq(K_ref.U, K_pj.U)
+        @test strict_eq(K_ref.F, K_pj.F)
         @test Int(K_pj.common.status) == 0
         # Refactor on .nzval-only path. Warm once, then assert 0 allocs.
         nz = Anew.nzval
@@ -281,10 +281,10 @@ function strict_match_all(A::SparseMatrixCSC)
     @test K_ref.p == K_pj.p
     @test K_ref.q == K_pj.q
     @test K_ref.R == K_pj.R
-    @test K_ref.Rs == K_pj.Rs
-    @test K_ref.L == K_pj.L
-    @test K_ref.U == K_pj.U
-    return @test K_ref.F == K_pj.F
+    @test strict_eq(K_ref.Rs, K_pj.Rs)
+    @test strict_eq(K_ref.L, K_pj.L)
+    @test strict_eq(K_ref.U, K_pj.U)
+    return @test strict_eq(K_ref.F, K_pj.F)
 end
 
 # ---------- sparse matrix zoo: structure variety ---------------------------
@@ -436,16 +436,16 @@ end
         B = sparse(I_idx, J_idx, V2, n, n)
         K_ref = KLU.klu(A); KLU.klu!(K_ref, B)
         K_pj = PureKLU.klu(A; use_fma = USE_FMA, detect_banded = false); PureKLU.klu!(K_pj, B)
-        @test K_ref.L == K_pj.L
-        @test K_ref.U == K_pj.U
-        @test K_ref.F == K_pj.F
-        @test K_ref.Rs == K_pj.Rs
+        @test strict_eq(K_ref.L, K_pj.L)
+        @test strict_eq(K_ref.U, K_pj.U)
+        @test strict_eq(K_ref.F, K_pj.F)
+        @test strict_eq(K_ref.Rs, K_pj.Rs)
         # refactor with just nzval
         K_ref2 = KLU.klu(A); KLU.klu!(K_ref2, B.nzval)
         K_pj2 = PureKLU.klu(A; use_fma = USE_FMA, detect_banded = false); PureKLU.klu!(K_pj2, B.nzval)
-        @test K_ref2.L == K_pj2.L
-        @test K_ref2.U == K_pj2.U
-        @test K_ref2.F == K_pj2.F
+        @test strict_eq(K_ref2.L, K_pj2.L)
+        @test strict_eq(K_ref2.U, K_pj2.U)
+        @test strict_eq(K_ref2.F, K_pj2.F)
     end
 end
 
@@ -464,8 +464,8 @@ end
         PureKLU.klu_factor!(K_pj)
         @test K_ref.p == K_pj.p
         @test K_ref.q == K_pj.q
-        @test K_ref.L == K_pj.L
-        @test K_ref.U == K_pj.U
+        @test strict_eq(K_ref.L, K_pj.L)
+        @test strict_eq(K_ref.U, K_pj.U)
         b = randn(n)
         @test K_ref \ b ≈ K_pj \ b
     end
@@ -571,12 +571,12 @@ end
         B = sparse(I_idx, J_idx, V, n, n)
         KLU.klu!(K_ref, B)
         PureKLU.klu!(K_pj, B)
-        @test K_ref.L == K_pj.L
-        @test K_ref.U == K_pj.U
-        @test K_ref.F == K_pj.F
-        @test K_ref.Rs == K_pj.Rs
+        @test strict_eq(K_ref.L, K_pj.L)
+        @test strict_eq(K_ref.U, K_pj.U)
+        @test strict_eq(K_ref.F, K_pj.F)
+        @test strict_eq(K_ref.Rs, K_pj.Rs)
         b = randn(n)
-        @test K_ref \ b == K_pj \ b
+        @test strict_eq(K_ref \ b, K_pj \ b)
     end
 end
 
@@ -622,8 +622,8 @@ end
     Random.seed!(91)
     n = 12
     A = sprand(n, n, 0.3) + n * I
-    P_user = Vector{Int64}(0:(n - 1))     # 0-based identity
-    Q_user = Vector{Int64}(0:(n - 1))
+    P_user = Vector{Int}(0:(n - 1))     # 0-based identity; native Int = Ti on this arch
+    Q_user = Vector{Int}(0:(n - 1))
     K_ref = KLU.KLUFactorization(A)
     KLU.klu_analyze!(K_ref, copy(P_user), copy(Q_user))
     K_pj = PureKLU.KLUFactorization(A)
@@ -634,8 +634,8 @@ end
     KLU.klu_factor!(K_ref); PureKLU.klu_factor!(K_pj)
     @test K_ref.p == K_pj.p
     @test K_ref.q == K_pj.q
-    @test K_ref.L == K_pj.L
-    @test K_ref.U == K_pj.U
+    @test strict_eq(K_ref.L, K_pj.L)
+    @test strict_eq(K_ref.U, K_pj.U)
 end
 
 # ---------- 1×1 / 2×2 degenerate matrices ----------------------------------
@@ -646,8 +646,8 @@ end
     K_ref = KLU.klu(A1); K_pj = PureKLU.klu(A1; use_fma = USE_FMA, detect_banded = false)
     @test K_ref.p == K_pj.p
     @test K_ref.q == K_pj.q
-    @test K_ref.U == K_pj.U
-    @test K_ref \ [6.0] == K_pj \ [6.0]
+    @test strict_eq(K_ref.U, K_pj.U)
+    @test strict_eq(K_ref \ [6.0], K_pj \ [6.0])
 
     # 2x2 various
     for M in (
@@ -660,8 +660,8 @@ end
         K_ref = KLU.klu(A); K_pj = PureKLU.klu(A; use_fma = USE_FMA, detect_banded = false)
         @test K_ref.p == K_pj.p
         @test K_ref.q == K_pj.q
-        @test K_ref.L == K_pj.L
-        @test K_ref.U == K_pj.U
+        @test strict_eq(K_ref.L, K_pj.L)
+        @test strict_eq(K_ref.U, K_pj.U)
     end
 end
 
